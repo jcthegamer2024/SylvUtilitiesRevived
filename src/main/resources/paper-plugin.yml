@@ -1,0 +1,6 @@
+name: SylvUtilities
+version: '1.0'
+main: org.notionsmp.sylvUtilities.SylvUtilities
+api-version: '1.21'
+load: STARTUP
+authors: [ Akis ]
