@@ -1,5 +1,5 @@
 name: SylvUtilities
-version: '1.0'
+version: ${version}
 main: org.notionsmp.sylvUtilities.SylvUtilities
 api-version: '1.21'
 load: POSTWORLD
