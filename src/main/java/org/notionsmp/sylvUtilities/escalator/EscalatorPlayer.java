@@ -5,7 +5,6 @@ import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import org.bukkit.Location;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Mannequin;
 import org.bukkit.util.Vector;
@@ -16,7 +15,6 @@ public final class EscalatorPlayer {
     private final Escalator escalator;
     private final UUID playerId;
     private final Mannequin mannequin;
-    private final Interaction vehicle;
     private final GameMode previousGameMode;
     private final Entity previousSpectatorTarget;
     private double travelled;
@@ -26,11 +24,10 @@ public final class EscalatorPlayer {
     private boolean finishing;
     private int soundCooldownTicks;
 
-    public EscalatorPlayer(final Escalator escalator, final Player player, final Mannequin mannequin, final Interaction vehicle) {
+    public EscalatorPlayer(final Escalator escalator, final Player player, final Mannequin mannequin) {
         this.escalator = escalator;
         this.playerId = player.getUniqueId();
         this.mannequin = mannequin;
-        this.vehicle = vehicle;
         this.previousGameMode = player.getGameMode();
         this.previousSpectatorTarget = player.getSpectatorTarget();
         this.travelled = 0.0;
@@ -44,10 +41,6 @@ public final class EscalatorPlayer {
 
     public UUID playerId() {
         return this.playerId;
-    }
-
-    public UUID vehicleId() {
-        return this.vehicle.getUniqueId();
     }
 
     public UUID mannequinId() {
@@ -82,7 +75,6 @@ public final class EscalatorPlayer {
         base.setPitch(0.0f);
 
         this.mannequin.teleport(base);
-        this.vehicle.teleport(base.clone().add(0.0, 0.4, 0.0));
         this.tryPlaySound(player, base);
 
         if (this.travelled >= this.length - 1.0E-6) {
@@ -123,16 +115,12 @@ public final class EscalatorPlayer {
         }
 
         this.mannequin.remove();
-        this.vehicle.remove();
     }
 
     public void forceStop(final Player player) {
         this.finishing = true;
         if (!this.mannequin.isDead()) {
             this.mannequin.remove();
-        }
-        if (!this.vehicle.isDead()) {
-            this.vehicle.remove();
         }
         player.setSpectatorTarget(null);
         if (this.previousGameMode == GameMode.SPECTATOR) {
@@ -155,14 +143,6 @@ public final class EscalatorPlayer {
             m.setCustomNameVisible(false);
             m.setDescription(null);
             m.setProfile(profile);
-        });
-    }
-
-    public static Interaction spawnVehicle(final Location location) {
-        return location.getWorld().spawn(location.clone().add(0.0, 0.2, 0.0), Interaction.class, i -> {
-            i.setInteractionHeight(0.1f);
-            i.setInteractionWidth(0.1f);
-            i.setPersistent(false);
         });
     }
 

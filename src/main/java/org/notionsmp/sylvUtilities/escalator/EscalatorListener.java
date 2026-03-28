@@ -4,7 +4,6 @@ import com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -27,23 +26,6 @@ public final class EscalatorListener implements Listener {
             return;
         }
         this.manager.tryStart(event.getPlayer(), event.getTo());
-    }
-
-    @EventHandler
-    public void onDismount(final EntityDismountEvent event) {
-        if (!(event.getEntity() instanceof Player player)) {
-            return;
-        }
-        final EscalatorPlayer session = this.manager.session(player.getUniqueId());
-        if (session == null) {
-            return;
-        }
-        if (session.isFinishing()) {
-            return;
-        }
-        if (event.getDismounted() != null && event.getDismounted().getUniqueId().equals(session.vehicleId())) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler

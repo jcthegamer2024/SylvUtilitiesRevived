@@ -258,8 +258,7 @@ public final class EscalatorManager {
 
         final var mannequin = EscalatorPlayer.spawnMannequin(player, start);
         this.applyNoNameTag(mannequin);
-        final var vehicle = EscalatorPlayer.spawnVehicle(start);
-        final EscalatorPlayer session = new EscalatorPlayer(escalator, player, mannequin, vehicle);
+        final EscalatorPlayer session = new EscalatorPlayer(escalator, player, mannequin);
         session.preparePlayer(player);
         this.active.put(player.getUniqueId(), session);
     }
