@@ -3,39 +3,43 @@ package org.notionsmp.sylvUtilities.escalator;
 import java.util.UUID;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import org.bukkit.Location;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Mannequin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 
 public final class EscalatorPlayer {
     private final Escalator escalator;
     private final UUID playerId;
     private final Mannequin mannequin;
     private final Interaction vehicle;
-    private final boolean previousInvisible;
-    private final PotionEffect previousInvisibility;
+    private final GameMode previousGameMode;
+    private final Entity previousSpectatorTarget;
     private double travelled;
     private final double length;
     private final Vector unit;
     private final float yaw;
     private boolean finishing;
+    private int soundCooldownTicks;
 
     public EscalatorPlayer(final Escalator escalator, final Player player, final Mannequin mannequin, final Interaction vehicle) {
         this.escalator = escalator;
         this.playerId = player.getUniqueId();
         this.mannequin = mannequin;
         this.vehicle = vehicle;
-        this.previousInvisible = player.isInvisible();
-        this.previousInvisibility = player.getPotionEffect(PotionEffectType.INVISIBILITY);
+        this.previousGameMode = player.getGameMode();
+        this.previousSpectatorTarget = player.getSpectatorTarget();
         this.travelled = 0.0;
         this.length = Math.max(0.0, escalator.length());
         final Vector dir = escalator.directionVector();
         this.unit = dir.lengthSquared() == 0.0 ? new Vector(0, 0, 0) : dir.clone().normalize();
         this.yaw = computeYaw(this.unit);
         this.finishing = false;
+        this.soundCooldownTicks = 0;
     }
 
     public UUID playerId() {
@@ -46,14 +50,17 @@ public final class EscalatorPlayer {
         return this.vehicle.getUniqueId();
     }
 
+    public UUID mannequinId() {
+        return this.mannequin.getUniqueId();
+    }
+
     public boolean isFinishing() {
         return this.finishing;
     }
 
     public void preparePlayer(final Player player) {
-        player.setInvisible(true);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, true, false, false));
-        this.vehicle.addPassenger(player);
+        player.setGameMode(GameMode.SPECTATOR);
+        player.setSpectatorTarget(this.mannequin);
     }
 
     public boolean tick(final Player player) {
@@ -76,6 +83,7 @@ public final class EscalatorPlayer {
 
         this.mannequin.teleport(base);
         this.vehicle.teleport(base.clone().add(0.0, 0.4, 0.0));
+        this.tryPlaySound(player, base);
 
         if (this.travelled >= this.length - 1.0E-6) {
             this.finish(player);
@@ -84,21 +92,38 @@ public final class EscalatorPlayer {
         return false;
     }
 
+    private void tryPlaySound(final Player player, final Location location) {
+        final String soundKey = this.escalator.soundKey();
+        if (soundKey == null || soundKey.isBlank()) {
+            return;
+        }
+        if (this.soundCooldownTicks > 0) {
+            this.soundCooldownTicks--;
+            return;
+        }
+        this.soundCooldownTicks = 10;
+        try {
+            final Sound sound = Sound.sound(Key.key(soundKey), Sound.Source.AMBIENT, 0.6f, 1.0f);
+            player.playSound(sound, location.getX(), location.getY(), location.getZ());
+        } catch (final Exception ignored) {
+        }
+    }
+
     public void finish(final Player player) {
         this.finishing = true;
         final Location location = this.mannequin.getLocation().clone();
-        player.leaveVehicle();
-        player.teleport(location);
+        player.setSpectatorTarget(null);
+        if (this.previousGameMode == GameMode.SPECTATOR) {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.teleport(location);
+            player.setSpectatorTarget(this.previousSpectatorTarget);
+        } else {
+            player.setGameMode(this.previousGameMode);
+            player.teleport(location);
+        }
 
         this.mannequin.remove();
         this.vehicle.remove();
-
-        if (this.previousInvisibility != null) {
-            player.addPotionEffect(this.previousInvisibility);
-        } else {
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
-        }
-        player.setInvisible(this.previousInvisible);
     }
 
     public void forceStop(final Player player) {
@@ -109,13 +134,13 @@ public final class EscalatorPlayer {
         if (!this.vehicle.isDead()) {
             this.vehicle.remove();
         }
-        player.leaveVehicle();
-        if (this.previousInvisibility != null) {
-            player.addPotionEffect(this.previousInvisibility);
+        player.setSpectatorTarget(null);
+        if (this.previousGameMode == GameMode.SPECTATOR) {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setSpectatorTarget(this.previousSpectatorTarget);
         } else {
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
+            player.setGameMode(this.previousGameMode);
         }
-        player.setInvisible(this.previousInvisible);
     }
 
     public static Mannequin spawnMannequin(final Player player, final Location location) {

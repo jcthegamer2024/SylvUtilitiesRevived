@@ -3,6 +3,8 @@ package org.notionsmp.sylvUtilities;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import java.util.List;
+
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,7 +16,7 @@ import org.notionsmp.sylvUtilities.escalator.EscalatorManager;
 public final class SylvUtilities extends JavaPlugin {
 
     private EscalatorManager escalators;
-    private final String prefix = "[SylvUtilities] ";
+    private final String prefix = "<gradient:#254091:#24AAE1:#939599:#ECA609>sʏʟᴠᴀʀɪᴏɴ<dark_gray> » <reset>";
 
     @Override
     public void onEnable() {
@@ -42,7 +44,7 @@ public final class SylvUtilities extends JavaPlugin {
     }
 
     public void msg(final CommandSender sender, final String message) {
-        sender.sendMessage(this.prefix + message);
+        sender.sendMessage(MiniMessage.miniMessage().deserialize(this.prefix + message));
     }
 
     public EscalatorManager escalators() {

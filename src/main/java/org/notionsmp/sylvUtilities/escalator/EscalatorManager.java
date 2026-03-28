@@ -3,10 +3,12 @@ package org.notionsmp.sylvUtilities.escalator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitTask;
@@ -21,6 +23,7 @@ public final class EscalatorManager {
     private final Map<UUID, EscalatorPlayer> active = new HashMap<>();
     private BukkitTask task;
     private final Team noNameTagTeam;
+    private final Map<UUID, DebugView> debugViews = new HashMap<>();
 
     public EscalatorManager(final SylvUtilities plugin) {
         this.plugin = plugin;
@@ -30,9 +33,12 @@ public final class EscalatorManager {
 
     public void load() {
         this.escalators.clear();
+        int loaded = 0;
         for (final Escalator escalator : this.storage.load()) {
             this.escalators.put(escalator.id().toLowerCase(), escalator);
+            loaded++;
         }
+        this.plugin.getLogger().info("Loaded " + loaded + " escalator(s).");
     }
 
     public void start() {
@@ -46,6 +52,12 @@ public final class EscalatorManager {
         if (this.task != null) {
             this.task.cancel();
             this.task = null;
+        }
+        for (final UUID uuid : this.debugViews.keySet().toArray(UUID[]::new)) {
+            final DebugView view = this.debugViews.remove(uuid);
+            if (view != null) {
+                view.stop();
+            }
         }
         for (final UUID uuid : this.active.keySet().toArray(UUID[]::new)) {
             final Player player = Bukkit.getPlayer(uuid);
@@ -64,6 +76,10 @@ public final class EscalatorManager {
         return Collections.unmodifiableCollection(this.escalators.values());
     }
 
+    public List<String> ids() {
+        return this.escalators.values().stream().map(Escalator::id).sorted(String.CASE_INSENSITIVE_ORDER).toList();
+    }
+
     public Escalator get(final String id) {
         if (id == null) {
             return null;
@@ -71,7 +87,7 @@ public final class EscalatorManager {
         return this.escalators.get(id.toLowerCase());
     }
 
-    public boolean create(final String id, final Location top, final Location bottom, final EscalatorDirection direction, final double speed) {
+    public boolean create(final String id, final Location top, final Location bottom, final EscalatorDirection direction, final double speed, final String soundKey) {
         if (id == null || id.isBlank() || top == null || bottom == null || top.getWorld() == null || bottom.getWorld() == null) {
             return false;
         }
@@ -85,7 +101,7 @@ public final class EscalatorManager {
         if (direction == null || speed < 0.0) {
             return false;
         }
-        this.escalators.put(key, new Escalator(id, top, bottom, direction, speed));
+        this.escalators.put(key, new Escalator(id, top, bottom, direction, speed, normalizeSound(soundKey)));
         this.save();
         return true;
     }
@@ -143,6 +159,60 @@ public final class EscalatorManager {
         escalator.setDirection(direction);
         this.save();
         return true;
+    }
+
+    public boolean editSound(final String id, final String soundKey) {
+        final Escalator escalator = this.get(id);
+        if (escalator == null) {
+            return false;
+        }
+        escalator.setSoundKey(normalizeSound(soundKey));
+        this.save();
+        return true;
+    }
+
+    public boolean toggleShow(final Player player, final String escalatorId) {
+        final Escalator escalator = this.get(escalatorId);
+        if (player == null || escalator == null) {
+            return false;
+        }
+
+        final DebugView existing = this.debugViews.get(player.getUniqueId());
+        if (existing != null && existing.escalatorId.equalsIgnoreCase(escalator.id())) {
+            existing.stop();
+            this.debugViews.remove(player.getUniqueId());
+            return true;
+        }
+        if (existing != null) {
+            existing.stop();
+            this.debugViews.remove(player.getUniqueId());
+        }
+
+        final DebugView view = new DebugView(this.plugin, player.getUniqueId(), escalator.id());
+        this.debugViews.put(player.getUniqueId(), view);
+        view.start(() -> {
+            final Player p = Bukkit.getPlayer(player.getUniqueId());
+            if (p == null) {
+                return false;
+            }
+            final Escalator e = this.get(escalator.id());
+            if (e == null) {
+                return false;
+            }
+            this.drawLine(p, e);
+            return true;
+        });
+        return true;
+    }
+
+    public void stopShow(final Player player) {
+        if (player == null) {
+            return;
+        }
+        final DebugView view = this.debugViews.remove(player.getUniqueId());
+        if (view != null) {
+            view.stop();
+        }
     }
 
     public boolean isOnEscalator(final Player player) {
@@ -216,6 +286,34 @@ public final class EscalatorManager {
         }
     }
 
+    private void drawLine(final Player player, final Escalator escalator) {
+        final Location start = escalator.start();
+        final Location end = escalator.end();
+        if (start.getWorld() == null || end.getWorld() == null || !start.getWorld().getUID().equals(end.getWorld().getUID())) {
+            return;
+        }
+        final var dir = end.toVector().subtract(start.toVector());
+        final double len = dir.length();
+        if (len <= 0.0) {
+            return;
+        }
+        final var step = dir.clone().normalize().multiply(0.35);
+        final int points = (int) Math.ceil(len / 0.35);
+        final Location cursor = start.clone();
+        for (int i = 0; i <= points; i++) {
+            player.spawnParticle(Particle.END_ROD, cursor, 1, 0.0, 0.0, 0.0, 0.0);
+            cursor.add(step);
+        }
+    }
+
+    private static String normalizeSound(final String input) {
+        if (input == null) {
+            return null;
+        }
+        final String trimmed = input.trim();
+        return trimmed.isBlank() ? null : trimmed;
+    }
+
     private void tick() {
         for (final UUID uuid : this.active.keySet().toArray(UUID[]::new)) {
             final EscalatorPlayer session = this.active.get(uuid);
@@ -230,6 +328,34 @@ public final class EscalatorManager {
             final boolean done = session.tick(player);
             if (done) {
                 this.active.remove(uuid);
+            }
+        }
+    }
+
+    private static final class DebugView {
+        private final SylvUtilities plugin;
+        private final UUID playerId;
+        private final String escalatorId;
+        private BukkitTask task;
+
+        private DebugView(final SylvUtilities plugin, final UUID playerId, final String escalatorId) {
+            this.plugin = plugin;
+            this.playerId = playerId;
+            this.escalatorId = escalatorId;
+        }
+
+        private void start(final java.util.function.Supplier<Boolean> tick) {
+            this.task = Bukkit.getScheduler().runTaskTimer(this.plugin, () -> {
+                if (!tick.get()) {
+                    this.stop();
+                }
+            }, 1L, 10L);
+        }
+
+        private void stop() {
+            if (this.task != null) {
+                this.task.cancel();
+                this.task = null;
             }
         }
     }

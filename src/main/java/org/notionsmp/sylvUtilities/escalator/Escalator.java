@@ -10,19 +10,22 @@ public final class Escalator {
     private Location bottom;
     private EscalatorDirection direction;
     private double speedBlocksPerSecond;
+    private String soundKey;
 
     public Escalator(
         final String id,
         final Location top,
         final Location bottom,
         final EscalatorDirection direction,
-        final double speedBlocksPerSecond
+        final double speedBlocksPerSecond,
+        final String soundKey
     ) {
         this.id = id;
         this.top = top.clone();
         this.bottom = bottom.clone();
         this.direction = direction;
         this.speedBlocksPerSecond = speedBlocksPerSecond;
+        this.soundKey = soundKey;
     }
 
     public String id() {
@@ -49,6 +52,10 @@ public final class Escalator {
         return this.speedBlocksPerSecond;
     }
 
+    public String soundKey() {
+        return this.soundKey;
+    }
+
     public void setTop(final Location top) {
         this.top = top.clone();
     }
@@ -63,6 +70,10 @@ public final class Escalator {
 
     public void setSpeedBlocksPerSecond(final double speedBlocksPerSecond) {
         this.speedBlocksPerSecond = speedBlocksPerSecond;
+    }
+
+    public void setSoundKey(final String soundKey) {
+        this.soundKey = soundKey;
     }
 
     public Location start() {
