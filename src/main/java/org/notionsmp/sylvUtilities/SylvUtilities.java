@@ -12,6 +12,7 @@ import org.notionsmp.sylvUtilities.command.SylvCommand;
 import org.notionsmp.sylvUtilities.command.subcommand.EscalatorSubcommand;
 import org.notionsmp.sylvUtilities.escalator.EscalatorListener;
 import org.notionsmp.sylvUtilities.escalator.EscalatorManager;
+import org.notionsmp.sylvUtilities.nightvision.NightVisionModule;
 
 public final class SylvUtilities extends JavaPlugin {
 
@@ -28,9 +29,11 @@ public final class SylvUtilities extends JavaPlugin {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
             final var root = new SylvCommand(this)
-                .register(new EscalatorSubcommand(this.escalators));
+                    .register(new EscalatorSubcommand(this.escalators));
             commands.register(root.build(), "Sylvarion Utilities", List.of());
         });
+
+        new NightVisionModule(this).enable();
 
         this.msg(Bukkit.getConsoleSender(), "Sucessfuly started Sylvarion Utilities v" + this.getPluginMeta().getVersion());
     }
