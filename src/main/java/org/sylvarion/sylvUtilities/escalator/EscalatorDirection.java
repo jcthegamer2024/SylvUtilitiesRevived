@@ -1,4 +1,4 @@
-package org.notionsmp.sylvUtilities.escalator;
+package org.sylvarion.sylvUtilities.escalator;
 
 import java.util.Locale;
 

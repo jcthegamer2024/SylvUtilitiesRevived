@@ -1,4 +1,4 @@
-package org.notionsmp.sylvUtilities.nightvision;
+package org.sylvarion.sylvUtilities.nightvision;
 
 import com.mojang.brigadier.Command;
 import io.papermc.paper.command.brigadier.Commands;
@@ -6,7 +6,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.notionsmp.sylvUtilities.SylvUtilities;
+import org.sylvarion.sylvUtilities.SylvUtilities;
 
 public final class NightVisionModule {
     public static final String PERMISSION = "sylvutilities.nightvision";

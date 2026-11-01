@@ -1,4 +1,4 @@
-package org.notionsmp.sylvUtilities.escalator;
+package org.sylvarion.sylvUtilities.escalator;
 
 import com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent;
 import org.bukkit.entity.Player;

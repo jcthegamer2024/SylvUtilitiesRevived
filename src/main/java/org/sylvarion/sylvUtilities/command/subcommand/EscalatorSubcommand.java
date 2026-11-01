@@ -1,4 +1,4 @@
-package org.notionsmp.sylvUtilities.command.subcommand;
+package org.sylvarion.sylvUtilities.command.subcommand;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -16,11 +16,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.notionsmp.sylvUtilities.SylvUtilities;
-import org.notionsmp.sylvUtilities.command.SylvSubcommand;
-import org.notionsmp.sylvUtilities.escalator.Escalator;
-import org.notionsmp.sylvUtilities.escalator.EscalatorDirection;
-import org.notionsmp.sylvUtilities.escalator.EscalatorManager;
+import org.sylvarion.sylvUtilities.SylvUtilities;
+import org.sylvarion.sylvUtilities.command.SylvSubcommand;
+import org.sylvarion.sylvUtilities.escalator.Escalator;
+import org.sylvarion.sylvUtilities.escalator.EscalatorDirection;
+import org.sylvarion.sylvUtilities.escalator.EscalatorManager;
 
 public final class EscalatorSubcommand implements SylvSubcommand {
     private final EscalatorManager escalators;

@@ -1,4 +1,4 @@
-package org.notionsmp.sylvUtilities;
+package org.sylvarion.sylvUtilities;
 
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -8,11 +8,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.notionsmp.sylvUtilities.command.SylvCommand;
-import org.notionsmp.sylvUtilities.command.subcommand.EscalatorSubcommand;
-import org.notionsmp.sylvUtilities.escalator.EscalatorListener;
-import org.notionsmp.sylvUtilities.escalator.EscalatorManager;
-import org.notionsmp.sylvUtilities.nightvision.NightVisionModule;
+import org.sylvarion.sylvUtilities.command.SylvCommand;
+import org.sylvarion.sylvUtilities.command.subcommand.EscalatorSubcommand;
+import org.sylvarion.sylvUtilities.escalator.EscalatorListener;
+import org.sylvarion.sylvUtilities.escalator.EscalatorManager;
+import org.sylvarion.sylvUtilities.nightvision.NightVisionModule;
 
 public final class SylvUtilities extends JavaPlugin {
 

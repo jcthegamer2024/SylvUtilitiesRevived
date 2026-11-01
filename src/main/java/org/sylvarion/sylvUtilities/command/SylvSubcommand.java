@@ -1,8 +1,8 @@
-package org.notionsmp.sylvUtilities.command;
+package org.sylvarion.sylvUtilities.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import org.notionsmp.sylvUtilities.SylvUtilities;
+import org.sylvarion.sylvUtilities.SylvUtilities;
 
 public interface SylvSubcommand {
     String name();

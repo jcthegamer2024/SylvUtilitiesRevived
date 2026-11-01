@@ -1,4 +1,4 @@
-package org.notionsmp.sylvUtilities.escalator;
+package org.sylvarion.sylvUtilities.escalator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,7 +16,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.notionsmp.sylvUtilities.SylvUtilities;
+import org.sylvarion.sylvUtilities.SylvUtilities;
 
 public final class EscalatorStorage {
     private static final Type LIST_TYPE = TypeToken.getParameterized(List.class, EscalatorData.class).getType();

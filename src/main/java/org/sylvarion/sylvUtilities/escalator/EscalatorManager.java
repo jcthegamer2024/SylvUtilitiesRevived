@@ -1,4 +1,4 @@
-package org.notionsmp.sylvUtilities.escalator;
+package org.sylvarion.sylvUtilities.escalator;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.notionsmp.sylvUtilities.SylvUtilities;
+import org.sylvarion.sylvUtilities.SylvUtilities;
 
 public final class EscalatorManager {
     private final SylvUtilities plugin;
