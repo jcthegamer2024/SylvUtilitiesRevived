@@ -1,6 +1,6 @@
 name: SylvUtilities
 version: ${version}
 main: org.notionsmp.sylvUtilities.SylvUtilities
-api-version: '1.21'
+api-version: '26.3'
 load: POSTWORLD
 authors: [ Akis ]

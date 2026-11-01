@@ -11,6 +11,10 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -24,6 +28,7 @@ public final class EscalatorManager {
     private BukkitTask task;
     private final Team noNameTagTeam;
     private final Map<UUID, DebugView> debugViews = new HashMap<>();
+    private final Listener rideListener = new RideListener();
 
     public EscalatorManager(final SylvUtilities plugin) {
         this.plugin = plugin;
@@ -45,6 +50,7 @@ public final class EscalatorManager {
         if (this.task != null) {
             return;
         }
+        Bukkit.getPluginManager().registerEvents(this.rideListener, this.plugin);
         this.task = Bukkit.getScheduler().runTaskTimer(this.plugin, this::tick, 1L, 1L);
     }
 
@@ -66,6 +72,7 @@ public final class EscalatorManager {
             }
         }
         this.active.clear();
+        HandlerList.unregisterAll(this.rideListener);
     }
 
     public void save() {
@@ -256,10 +263,13 @@ public final class EscalatorManager {
         start.setYaw(player.getLocation().getYaw());
         start.setPitch(0.0f);
 
-        final var mannequin = EscalatorPlayer.spawnMannequin(player, start);
-        this.applyNoNameTag(mannequin);
-        final EscalatorPlayer session = new EscalatorPlayer(escalator, player, mannequin);
+        final var vehicle = EscalatorPlayer.spawnVehicle(start);
+        this.applyNoNameTag(vehicle);
+        final EscalatorPlayer session = new EscalatorPlayer(escalator, player, vehicle);
         session.preparePlayer(player);
+        if (session.isFinishing()) {
+            return;
+        }
         this.active.put(player.getUniqueId(), session);
     }
 
@@ -327,6 +337,20 @@ public final class EscalatorManager {
             final boolean done = session.tick(player);
             if (done) {
                 this.active.remove(uuid);
+            }
+        }
+    }
+
+    /** Stops riders from dismounting (e.g. by sneaking) while the escalator is moving them. */
+    private final class RideListener implements Listener {
+        @EventHandler(ignoreCancelled = true)
+        public void onDismount(final EntityDismountEvent event) {
+            if (!(event.getEntity() instanceof Player player)) {
+                return;
+            }
+            final EscalatorPlayer session = EscalatorManager.this.active.get(player.getUniqueId());
+            if (session != null && !session.isFinishing() && event.isCancellable()) {
+                event.setCancelled(true);
             }
         }
     }
