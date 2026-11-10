@@ -13,7 +13,7 @@ public final class EscalatorPlayer {
      * Vertical offset of the invisible vehicle. If riders look sunk into the floor,
      * increase this (e.g. 0.3). If they float too high, decrease it (e.g. -0.3).
      */
-    private static final double RIDE_Y_OFFSET = 0.0;
+    private static final double RIDE_Y_OFFSET = 1.4;
 
     private final Escalator escalator;
     private final UUID playerId;
