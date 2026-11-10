@@ -19,7 +19,9 @@ emojis:
   party: party_parrot
 ```
 
-Restart the server to apply changes. `:lmfao:` becomes the Nexo `lmfao` glyph in Discord-to-Minecraft chat. Discord custom emojis and animated custom emojis are supported by name too: DiscordSRV normally converts their markup into `:name:` before the bridge runs. Names are case-sensitive; unmapped emojis stay unchanged. Unknown glyphs and invalid entries are skipped with a console warning.
+Run `/sylv reload` to apply the module toggle and emoji mappings without restarting (permission: `sylvutilities.reload`, default: operators). The command reports whether the bridge is disabled, unavailable, or enabled with a mapping count. It does not reload escalators or Nexo itself.
+
+`:lmfao:` becomes the Nexo `lmfao` glyph in Discord-to-Minecraft chat. Discord custom emojis and animated custom emojis are supported by name too: DiscordSRV normally converts their markup into `:name:` before the bridge runs. Names are case-sensitive; unmapped emojis stay unchanged. Unknown glyphs and invalid entries are skipped with a console warning.
 
 DiscordSRV must already relay the channel to Minecraft. Configure its `DiscordChatChannelEmojiBehavior` to `name` for standard Unicode emoji aliases, or `show` to leave Unicode emojis visible. Emoji content discarded by DiscordSRV filters cannot be recovered by this bridge.
 

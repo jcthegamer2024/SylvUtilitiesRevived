@@ -22,6 +22,12 @@ public final class SylvCommand {
 
     public LiteralCommandNode<CommandSourceStack> build() {
         final var root = Commands.literal("sylv");
+        root.then(Commands.literal("reload")
+                .requires(source -> source.getSender().hasPermission("sylvutilities.reload"))
+                .executes(context -> {
+                    this.plugin.msg(context.getSource().getSender(), this.plugin.reloadModules());
+                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                }));
         for (final SylvSubcommand subcommand : this.subcommands) {
             root.then(subcommand.build(this.plugin));
         }

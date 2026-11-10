@@ -4,6 +4,10 @@ main: org.sylvarion.sylvUtilities.SylvUtilities
 api-version: '26.3'
 load: POSTWORLD
 authors: [ Akis, jcthegamer2024 ]
+permissions:
+  sylvutilities.reload:
+    description: Reload SylvUtilities config and Discord emoji mappings
+    default: op
 dependencies:
   server:
     DiscordSRV:

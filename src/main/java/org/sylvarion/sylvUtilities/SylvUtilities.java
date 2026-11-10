@@ -27,20 +27,7 @@ public final class SylvUtilities extends JavaPlugin {
         if (!new java.io.File(this.getDataFolder(), "discord-emojis.yml").exists()) {
             this.saveResource("discord-emojis.yml", false);
         }
-        if (this.getConfig().getBoolean("modules.discord-nexo-emoji-bridge.enabled", false)) {
-            if (this.getServer().getPluginManager().isPluginEnabled("DiscordSRV")
-                    && this.getServer().getPluginManager().isPluginEnabled("Nexo")) {
-                try {
-                    this.emojiBridge = new DiscordNexoEmojiBridge(this);
-                    this.emojiBridge.enable();
-                } catch (RuntimeException | LinkageError exception) {
-                    this.getLogger().log(java.util.logging.Level.WARNING,
-                            "Could not enable DiscordNexoEmojiBridge", exception);
-                }
-            } else {
-                this.getLogger().warning("DiscordNexoEmojiBridge requires enabled DiscordSRV and Nexo plugins.");
-            }
-        }
+        this.configureEmojiBridge();
         this.escalators = new EscalatorManager(this);
         this.escalators.load();
         this.escalators.start();
@@ -66,6 +53,36 @@ public final class SylvUtilities extends JavaPlugin {
         if (this.escalators != null) {
             this.escalators.stop();
             this.escalators.save();
+        }
+    }
+
+    public String reloadModules() {
+        this.reloadConfig();
+        return this.configureEmojiBridge();
+    }
+
+    private String configureEmojiBridge() {
+        if (this.emojiBridge != null) {
+            this.emojiBridge.disable();
+            this.emojiBridge = null;
+        }
+        if (!this.getConfig().getBoolean("modules.discord-nexo-emoji-bridge.enabled", false)) {
+            return "<gray>DiscordNexoEmojiBridge is disabled.";
+        }
+        if (!this.getServer().getPluginManager().isPluginEnabled("DiscordSRV")
+                || !this.getServer().getPluginManager().isPluginEnabled("Nexo")) {
+            this.getLogger().warning("DiscordNexoEmojiBridge requires enabled DiscordSRV and Nexo plugins.");
+            return "<red>Bridge unavailable: DiscordSRV and Nexo must both be enabled.";
+        }
+        try {
+            final var bridge = new DiscordNexoEmojiBridge(this);
+            bridge.enable();
+            this.emojiBridge = bridge;
+            return "<green>DiscordNexoEmojiBridge enabled with " + bridge.mappingCount() + " emoji mappings.";
+        } catch (RuntimeException | LinkageError exception) {
+            this.getLogger().log(java.util.logging.Level.WARNING,
+                    "Could not enable DiscordNexoEmojiBridge", exception);
+            return "<red>Bridge failed to enable. Check the console for details.";
         }
     }
 

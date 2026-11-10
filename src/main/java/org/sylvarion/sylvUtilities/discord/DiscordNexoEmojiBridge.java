@@ -72,6 +72,10 @@ public final class DiscordNexoEmojiBridge {
                         match.group(1) != null ? match.group(1) : match.group(2), original.build())));
     }
 
+    public int mappingCount() {
+        return this.replacements.size();
+    }
+
     public void disable() {
         if (this.subscribed) {
             DiscordSRV.api.unsubscribe(this);

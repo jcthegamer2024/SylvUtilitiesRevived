@@ -1,7 +1,7 @@
 # Discord emoji name -> Nexo glyph ID. No colons or <glyph:...> needed.
 # Supports typed :name: aliases and Discord custom emojis (including animated ones).
 # Names are case-sensitive. Unmapped emojis are left alone.
-# Restart the server after editing this file or toggling the module.
+# Run /sylv reload after editing this file or toggling the module.
 # Players must use the Nexo resource pack to see the glyphs.
 emojis:
   lmfao: lmfao
