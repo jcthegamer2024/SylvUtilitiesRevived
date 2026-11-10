@@ -1,0 +1,6 @@
+# Literal, case-sensitive replacements in Minecraft player chat.
+# Quote both sides. No regular expressions or MiniMessage parsing.
+# Longer matches win; replacement output is not processed again.
+# Enable modules.text-replacements.enabled in config.yml, then /sylv reload.
+replacements:
+  "[u]": "Ⓤ"

@@ -14,11 +14,13 @@ import org.sylvarion.sylvUtilities.escalator.EscalatorListener;
 import org.sylvarion.sylvUtilities.escalator.EscalatorManager;
 import org.sylvarion.sylvUtilities.nightvision.NightVisionModule;
 import org.sylvarion.sylvUtilities.discord.DiscordNexoEmojiBridge;
+import org.sylvarion.sylvUtilities.chat.TextReplacementModule;
 
 public final class SylvUtilities extends JavaPlugin {
 
     private EscalatorManager escalators;
     private DiscordNexoEmojiBridge emojiBridge;
+    private TextReplacementModule textReplacements;
     private final String prefix = "<gradient:#254091:#24AAE1:#939599:#ECA609>sʏʟᴠᴀʀɪᴏɴ<dark_gray> » <reset>";
 
     @Override
@@ -28,6 +30,7 @@ public final class SylvUtilities extends JavaPlugin {
             this.saveResource("discord-emojis.yml", false);
         }
         this.configureEmojiBridge();
+        this.configureTextReplacements();
         this.escalators = new EscalatorManager(this);
         this.escalators.load();
         this.escalators.start();
@@ -47,6 +50,9 @@ public final class SylvUtilities extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (this.textReplacements != null) {
+            this.textReplacements.disable();
+        }
         if (this.emojiBridge != null) {
             this.emojiBridge.disable();
         }
@@ -58,7 +64,30 @@ public final class SylvUtilities extends JavaPlugin {
 
     public String reloadModules() {
         this.reloadConfig();
-        return this.configureEmojiBridge();
+        return this.configureEmojiBridge() + " <reset>" + this.configureTextReplacements();
+    }
+
+    private String configureTextReplacements() {
+        if (this.textReplacements != null) {
+            this.textReplacements.disable();
+            this.textReplacements = null;
+        }
+        if (!new java.io.File(this.getDataFolder(), "text-replacements.yml").exists()) {
+            this.saveResource("text-replacements.yml", false);
+        }
+        if (!this.getConfig().getBoolean("modules.text-replacements.enabled", false)) {
+            return "<gray>Text replacements are disabled.";
+        }
+        final var module = new TextReplacementModule(this);
+        try {
+            final String status = module.enable();
+            this.textReplacements = module;
+            return status;
+        } catch (Exception | LinkageError exception) {
+            module.disable();
+            this.getLogger().log(java.util.logging.Level.WARNING, "Could not enable text replacements", exception);
+            return "<red>Text replacements failed to enable. Check the console.";
+        }
     }
 
     private String configureEmojiBridge() {

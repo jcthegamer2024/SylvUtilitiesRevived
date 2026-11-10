@@ -1,3 +1,5 @@
 modules:
+  text-replacements:
+    enabled: false
   discord-nexo-emoji-bridge:
     enabled: false

@@ -18,6 +18,8 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.3.build.+")
     compileOnly("com.discordsrv:discordsrv:1.30.5")
+    compileOnly("de.hexaoxi:carbonchat-api:3.0.0-beta.39")
+    testImplementation("net.kyori:adventure-api:4.25.0")
     compileOnly("com.nexomc:nexo:1.29.1") { transitive = false }
     testImplementation("com.discordsrv:discordsrv:1.30.5")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
