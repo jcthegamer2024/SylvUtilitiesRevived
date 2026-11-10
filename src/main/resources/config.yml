@@ -1,0 +1,3 @@
+modules:
+  discord-nexo-emoji-bridge:
+    enabled: false

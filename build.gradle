@@ -7,6 +7,8 @@ group = 'org.sylvarion'
 
 repositories {
     mavenCentral()
+    maven { url = "https://nexus.scarsz.me/content/groups/public/" }
+    maven { url = "https://repo.nexomc.com/releases" }
     maven {
         name = "papermc-repo"
         url = "https://repo.papermc.io/repository/maven-public/"
@@ -15,7 +17,14 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.3.build.+")
+    compileOnly("com.discordsrv:discordsrv:1.30.5")
+    compileOnly("com.nexomc:nexo:1.29.1") { transitive = false }
+    testImplementation("com.discordsrv:discordsrv:1.30.5")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
+
+test { useJUnitPlatform() }
 
 tasks {
     runServer {

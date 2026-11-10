@@ -4,3 +4,13 @@ main: org.sylvarion.sylvUtilities.SylvUtilities
 api-version: '26.3'
 load: POSTWORLD
 authors: [ Akis, jcthegamer2024 ]
+dependencies:
+  server:
+    DiscordSRV:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Nexo:
+      load: BEFORE
+      required: false
+      join-classpath: true
